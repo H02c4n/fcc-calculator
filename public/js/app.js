@@ -1,18 +1,26 @@
 /*IOS CALCULATOR*/
 
-const form = document.querySelector("#calc_form");
+const output = document.getElementById("output");
+const form = document.getElementById("calc_form");
+const operand_btns = document.querySelectorAll("button[data-type=operand]");
+const operator_btns = document.querySelectorAll("button[data-type=operator]");
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 });
 
-const output = document.querySelector("#output");
-const operand_btns = document.querySelectorAll("button[data-type=operand]");
-
 let is_operator = false;
+let equation = [];
+
+const remove_active = () => {
+  operator_btns.forEach((btn) => {
+    btn.classList.remove("active");
+  });
+};
 
 operand_btns.forEach((btn) => {
   btn.addEventListener("click", (e) => {
+    remove_active();
     if (output.value == "0") {
       output.value = e.target.value;
     } else if (output.value.includes(".")) {
@@ -21,17 +29,14 @@ operand_btns.forEach((btn) => {
       is_operator = false;
       output.value = e.target.value;
     } else {
-      output.value = output + "" + e.target.value;
+      output.value = output.value + "" + e.target.value;
     }
   });
 });
 
-const operator_btns = document.querySelectorAll("button[data-type=operator]");
-console.log(operator_btns, operand_btns);
-let equation = [];
-
 operator_btns.forEach((btn) => {
   btn.addEventListener("click", (e) => {
+    remove_active();
     e.currentTarget.classList.add("active");
 
     switch (e.target.value) {
@@ -42,20 +47,19 @@ operator_btns.forEach((btn) => {
         output.value = parseFloat(output.value) * -1;
         break;
       case "=":
+        equation.push(output.value);
         output.value = eval(equation.join(""));
         equation = [];
         break;
       default:
         let last_item = equation[equation.length - 1];
         if (["/", "*", "+", "-"].includes(last_item) && is_operator) {
-          console.log(equation);
           equation.pop();
-          console.log(equation);
           equation.push(e.target.value);
-          console.log(equation);
         } else {
           equation.push(output.value);
           equation.push(e.target.value);
+          console.log(equation);
         }
         is_operator = true;
         break;
